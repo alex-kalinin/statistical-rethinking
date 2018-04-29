@@ -1,6 +1,6 @@
 ---
 title: "Chapter 2 — Notes"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=F}
