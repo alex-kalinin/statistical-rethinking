@@ -8,7 +8,7 @@ output: pdf_document
 rm(list=ls())
 ```
 
-### 3.1  Sampling from a grid-approximate posterior
+## 3.1  Sampling from a grid-approximate posterior
 
 * R Code 3.2:
 ```{r}
@@ -49,4 +49,57 @@ dens(sample(p_grid, prob=posterior, size=1e4, replace=T))
 dens(sample(p_grid, prob=posterior, size=1e5, replace=T))
 dens(sample(p_grid, prob=posterior, size=1e6, replace=T))
 ```
+
+## 3.2 Sampling to Summarize
+
+### 3.2.1. Intervals of defined boundaries.
+
+The posterior probability that the proportion of water is less than 0.5:
+
+* 3.6:
+```{r}
+p_grid < 0.5
+sum(posterior[p_grid < 0.5])
+```
+
+Samples array:
+```{r}
+head(samples, 100)
+```
+
+The same calculation using samples. Add up all samples that lie in the grid < 0.5, and divide by the total number of samples to get the frequency ~ probability:
+
+* 3.7:
+```{r}
+n = 1e4
+samples = sample(p_grid, prob=posterior, size=n, replace=T)
+sum(samples < 0.5) / n
+```
+
+ How much probability lies between 0.5 and 0.75:
+ * 3.8:
+```{r}
+sample_points = sum(samples > 0.5 & samples < 0.75) 
+sample_points
+sample_points / n
+
+```
+
+### 3.2.2. Intervals of defined mass.
+
+Boundaries of the lower 80% posterior probability lies:
+
+* 3.9:
+```{r}
+quantile(samples, probs = .8)
+```
+
+Middle 80%, i.e. lying between 10% and 90%:
+
+```{r}
+# 3.10
+quantile(samples, probs = c(0.1, 0.9))
+```
+
+The above are PERCENTILE INTERVALS.
 
