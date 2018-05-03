@@ -129,7 +129,7 @@ Highest Posterior Density Interval described the distribution better. It's the *
 HPDI(samples, prob=0.5)
 ```
 
- ### 3.2.3. Point Estimates
+### 3.2.3. Point Estimates
  
 A parameter with the highest posterior probability is called *a maximum a posteriori* estimate, or *MAP*.
 ```{r}
