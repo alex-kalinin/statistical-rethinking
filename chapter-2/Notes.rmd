@@ -1,6 +1,8 @@
 ---
 title: "Chapter 2 — Notes"
-output: pdf_document
+output: 
+  pdf_document: 
+    fig_caption: yes
 ---
 
 ```{r setup, include=F}
@@ -101,5 +103,49 @@ Middle 80%, i.e. lying between 10% and 90%:
 quantile(samples, probs = c(0.1, 0.9))
 ```
 
-The above are PERCENTILE INTERVALS.
+The above are PERCENTILE INTERVALS. Percentiles can be misleading if the distribution is highly skewed.
+```{r}
+# 3.11
+n <- 1000
+p_grid <- seq(0, 1, length.out = n)
+prior <- rep(1, n)
+likelihood <- dbinom(3, size=3, prob=p_grid)
+posterior_notnorm <- likelihood * prior
+posterior <- posterior_notnorm / sum(posterior_notnorm)
+samples <- sample(p_grid, size=1e4, replace=T, prob=posterior)
+plot(posterior, type='l')
+```
 
+```{r}
+# 3.12
+PI(samples, prob=0.5)
+```
+
+Highest Posterior Density Interval described the distribution better. It's the *narrowest* interval containing the specified probability mass, e.g. 50%.
+
+
+```{r}
+# 3.13
+HPDI(samples, prob=0.5)
+```
+
+ ### 3.2.3. Point Estimates
+ 
+A parameter with the highest posterior probability is called *a maximum a posteriori* estimate, or *MAP*.
+```{r}
+# 3.14
+which.max(posterior)
+p_grid[which.max(posterior)]
+```
+
+Use samples to get the same (or similar) result:
+```{r}
+# 3.15
+chainmode(samples, adj=0.01)
+```
+
+```{r}
+# 3.16
+mean(samples)
+median(samples)
+```
