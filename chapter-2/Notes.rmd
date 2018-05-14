@@ -1,5 +1,5 @@
 ---
-title: "Chapter 2 — Notes"
+title: "Chapter 3 -- Sampling The Imaginary"
 output: 
   pdf_document: 
     fig_caption: yes
@@ -106,13 +106,13 @@ quantile(samples, probs = c(0.1, 0.9))
 The above are PERCENTILE INTERVALS. Percentiles can be misleading if the distribution is highly skewed.
 ```{r}
 # 3.11
-n <- 1000
+n <- 10000
 p_grid <- seq(0, 1, length.out = n)
 prior <- rep(1, n)
 likelihood <- dbinom(3, size=3, prob=p_grid)
 posterior_notnorm <- likelihood * prior
 posterior <- posterior_notnorm / sum(posterior_notnorm)
-samples <- sample(p_grid, size=1e4, replace=T, prob=posterior)
+samples <- sample(p_grid, size=1e5, replace=T, prob=posterior)
 plot(posterior, type='l')
 ```
 
@@ -149,3 +149,63 @@ chainmode(samples, adj=0.01)
 mean(samples)
 median(samples)
 ```
+
+If the loss function is the absolute difference, then the posterior loss for p = 0.5 is 
+```{r}
+# 3.17
+sum(posterior * abs(0.5 - p_grid))
+```
+
+```{r}
+# 3.18
+loss <- sapply(p_grid, function(d) sum(posterior * abs(d - p_grid)))
+```
+
+```{r}
+# 3.19
+which.min(loss)
+p_grid[which.min(loss)]
+```
+
+The posterior median minimizes the abs loss function.
+Let's test the quadratic loss function:
+
+```{r}
+loss2 <- sapply(p_grid, function(d) sum(posterior * (d - p_grid)^2))
+which.min(loss2)
+p_grid[which.min(loss2)]
+```
+
+This is a mean.
+
+## 3.3. Sampling to Simulate Prediction
+
+### 3.3.1. Dummy Data
+
+```{r}
+# 3.20
+dbinom(0:2, size=2, prob=0.7)
+```
+
+We can sample from this distribution:
+```{r}
+# 3.22
+rbinom(10, size=2, prob=0.7)
+```
+
+Let's generate 100,000 dummy observations to verify that each values 0, 1, and 2 appear in proportion to its likelihood:
+```{r}
+# 3.23
+dummy_w <- rbinom(1e5, size=2, prob=0.7)
+table(dummy_w) / 1e5
+```
+
+Let's simulate the sample with 9 tosses:
+```{r}
+# 3.24
+dummy_w <- rbinom(1e5, size=9, prob=0.7)
+plot(table(dummy_w), xlab="Dummy Water Count")
+table(dummy_w)
+dummy_w[1:100]
+```
+
