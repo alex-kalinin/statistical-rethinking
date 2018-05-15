@@ -25,7 +25,8 @@ posterior <- posterior_notnorm / sum(posterior_notnorm)
 Draw 10,000 samples:
 * R Code 3.3:
 ```{r}
-samples <- sample(p_grid, prob=posterior, size=n, replace=T)
+samples_orig <- sample(p_grid, prob=posterior, size=n, replace=T)
+samples = samples_orig
 ```
 
 * 3.4:
@@ -207,5 +208,28 @@ dummy_w <- rbinom(1e5, size=9, prob=0.7)
 plot(table(dummy_w), xlab="Dummy Water Count")
 table(dummy_w)
 dummy_w[1:100]
+```
+
+## 3.2. Model Checking
+
+Below is a misleading distribution plot. While p = 0.6 is the likeliest estimate, if we simply use it as a point estimate we will obtain a much more narrow, "overly confident" predictions:
+
+```{r}
+# 3.25
+w <- rbinom(1e4, size=9, prob=0.6)
+plot(table(w), xlab="Dummy Water Count")
+```
+The correct way to generate predictions is to incorporate our uncertainty about p. We can do it by using sampled values of p, and averaging over all of them. The sampled values will appear with the right frequency, described by our posterior. Samples from the *posterior* distribution of p:
+```{r}
+samples[1:20]
+```
+
+```{r}
+# 3.26
+w2 <- rbinom(1e4, size=9, prob=samples_orig)
+table(w2)
+par(mfrow=c(1, 2))
+plot(table(w), xlab ="Overly confident")
+plot(table(w2), xlab="Correct")
 ```
 
