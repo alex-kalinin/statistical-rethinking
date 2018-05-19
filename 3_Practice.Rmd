@@ -55,8 +55,24 @@ quantile(samples, 0.8)
 ```
 
 ### 3E6. Which values of p contain the narrowest interval equal to 66% of the posterior probability?
-
 ```{r}
-
+samples_for_hpdi <- coda::as.mcmc(samples)
+# x <- sapply(0.66, function(p) coda::HPDinterval(samples_for_hpdi,  prob = p))
+x <- coda::HPDinterval(samples_for_hpdi, prob=0.66)
+c(x[1], x[2])
+HPDI(samples, prob=0.66)
 ```
 
+### 3E7. Which values of p contain 66% of the posterior probability, assuming equal posterior probability both below and above the interval?
+```{r}
+low = (1 - 0.66) / 2
+up = low + 0.66
+interval = c(low, up)
+c(interval, interval[2] - interval[1])
+quantile(samples, interval)
+```
+
+If the distribution is not too skewed then the Percentile Interval (PI) will approximately equal to the Highest Posterior Density Interval (HPDI):
+
+* PI: (0.501, 0.769)
+* HPDI: (0.521, 0.785)
