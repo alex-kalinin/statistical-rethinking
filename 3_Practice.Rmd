@@ -224,3 +224,40 @@ coda::HPDinterval(birth.samples_for_hpdi, prob=0.89)[1:2]
 coda::HPDinterval(birth.samples_for_hpdi, prob=0.97)[1:2]
 ```
 
+### 3H3. Use rbinom to simulate 10,000 replicates of 200 births. You should end up with 10,000 numbers, each one a count of boys out of 200. Compare the distribution of predicted numbers of boys to the actual count in the data (111 boys out of 200 births). There are many good ways to visualize the simulations, but the *dens* commmand is probably the easiest way. Does it look like the model fits the data well? That is, does the distribution of predictions include the actual observatin as a central, likely outcome?
+```{r}
+boys <- rbinom(n=1e4, size=200, prob=birth.samples)
+plot(table(boys))
+abline(v=sum(birth.all), col="red")
+dens(boys)
+abline(v=sum(birth.all), col="red")
+```
+
+The distributio reflects the actual result, with *boys = 111* being the central, very likely outcome.
+
+### 3H4. Now compare 10,000 counts of boys from 100 simulated first borns only to the number of boys in *birth1*. How does the model look in this light?
+```{r}
+birth.boys_34 <- rbinom(1e4, size=100, prob=birth.samples)
+plot(table(birth.boys_34))
+abline(v=sum(birth1), col="red")
+dens(birth.boys_34)
+abline(v=sum(birth1), col="red")
+```
+
+The model **overestimates** the number of first-born boys.
+
+### 3H5. The model assumes the sex of the first and second births are independent. To check this assumption, focus now on second births that followed female first borns. Compare 10,000 simulated counts of boys to only second births that followed girls. To do this correctly, you need to count the number of first borns who were girls and simulate that many births, 10,000 times. Compare the counts of boys in your simulations to the actual observed count of boys following girls. How does the model look in this light? Any guesses what is going on in these data?
+
+```{r}
+birth.first_girls <- birth1 == 0
+birth.first_girls_count <- sum(birth.first_girls)
+birth.boys_followed_girls <- sum(birth2[birth.first_girls])
+birth.boys_35 <- rbinom(n = 1e4, size = birth.first_girls_count, prob=birth.samples)
+plot(table(birth.boys_35))
+abline(v=birth.boys_followed_girls, col="red")
+dens(birth.boys_35, adj=1)
+abline(v=birth.boys_followed_girls, col="red")
+```
+
+The model **underestimates** the number of second born boys in the scenario (1st girl) -> (2nd boy).
+
