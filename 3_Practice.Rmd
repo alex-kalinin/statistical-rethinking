@@ -121,7 +121,7 @@ sum(w6 == 6) / length(w6)
 ### 3M5. Start over at **3M1**, but now use a prior that is zero below *p = 0.5* and a constant above *p = 0.5*. This corresponds to prior information that a majority of the Earth's surface is water. Repeat each problem above and compare inferences. What difference does the better prior make? If it helps, compare inferences (using both priors) to the true value *p = 0.7*.
 
 ```{r}
-better.prior <- rep(2, N)
+better.prior <- rep(1, N)
 better.prior[p_grid < 0.5] = 0
 better.unstd_posterior = likelihood * better.prior
 better.posterior = better.unstd_posterior / sum(better.unstd_posterior)
@@ -154,8 +154,11 @@ Better posterior has a much narrower 90% HPDI that's centered around true value 
 better.w <- rbinom(1e4, size=15, prob=better.samples)
 layout(rbind(1, 2))
 par(mar=c(0,5,2,5))
+table(w)
 plot(table(w))
 par(mar=c(4,5,0,5))
+better.w[1] <- 0 # to add one zero value to align graphs
+table(better.w)
 plot(table(better.w))
 ```
 Probability of observing 8 water in 15 tosses:
