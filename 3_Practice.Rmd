@@ -76,3 +76,118 @@ If the distribution is not too skewed then the Percentile Interval (PI) will app
 
 * PI: (0.501, 0.769)
 * HPDI: (0.521, 0.785)
+ 
+### 3M1. Suppose the globe tossing data had turned out to be 8 water in 15 tosses. Construct the posterior distribution, using grid approximation. Use the same flat prior as before.
+
+```{r}
+N = 1000
+p_grid <- seq(0, 1, length.out = N)
+prior <- rep(1, N)
+likelihood <- dbinom(8, size=15, prob=p_grid)
+unstd_posterior <- likelihood * prior
+posterior <- unstd_posterior / sum(unstd_posterior)
+plot(posterior ~ p_grid, type="l")
+```
+
+### 3M2. Draw 10,000 samples from the grid approximation from above. Then use the samples to calculate the 90% HPDI for *p*.
+```{r}
+samples <- sample(p_grid, size=1e4, replace = T, prob=posterior)
+samples_for_hpdi <- coda::as.mcmc(samples)
+x <- coda::HPDinterval(samples_for_hpdi, prob=0.90)
+c(x[1], x[2])
+```
+
+### 3M3. Construct a posterior predictive check for this model and data. Simulate the distribution of samples, averaging over the posterior uncertainty in *p*. What is the probability of observing 8 water in 15 tosses.
+
+```{r}
+w <- rbinom(1e4, size=15, prob=samples)
+simplehist(w)
+```
+
+Probability of observing 8 water in 15 tosses:
+```{r}
+sum(w == 8) / length(w)
+mean(w == 8)
+```
+
+### 3M4. Using the posterior distribution constructed from the new (8/15) data, now calculate the probability of observing 6 water in 9 tosses.
+
+```{r}
+w6 <- rbinom(1e4, size=9, prob=samples)
+mean(w6 == 6)
+sum(w6 == 6) / length(w6)
+```
+
+### 3M5. Start over at **3M1**, but now use a prior that is zero below *p = 0.5* and a constant above *p = 0.5*. This corresponds to prior information that a majority of the Earth's surface is water. Repeat each problem above and compare inferences. What difference does the better prior make? If it helps, compare inferences (using both priors) to the true value *p = 0.7*.
+
+```{r}
+better.prior <- rep(2, N)
+better.prior[p_grid < 0.5] = 0
+better.unstd_posterior = likelihood * better.prior
+better.posterior = better.unstd_posterior / sum(better.unstd_posterior)
+par(mfrow=c(1, 2))
+plot(posterior ~ p_grid, type="l")
+plot(better.posterior ~ p_grid, type="l")
+```
+
+#### Repeat 3M2. Draw 10,000 samples; calculate the 90% HPDI for **p**:
+```{r}
+better.samples <- sample(p_grid, size=1e4, replace = T, prob=better.posterior)
+better.samples_for_hpdi <- coda::as.mcmc(better.samples)
+better.x <- coda::HPDinterval(better.samples_for_hpdi, prob=0.90)
+```
+
+Previous posterior:
+```{r}
+x
+```
+
+Better posterior:
+```{r}
+better.x
+```
+
+Better posterior has a much narrower 90% HPDI that's centered around true value of *p = 0.7*.
+
+#### Repeat 3M3. 
+```{r}
+better.w <- rbinom(1e4, size=15, prob=better.samples)
+layout(rbind(1, 2))
+par(mar=c(0,5,2,5))
+plot(table(w))
+par(mar=c(4,5,0,5))
+plot(table(better.w))
+```
+Probability of observing 8 water in 15 tosses:
+```{r}
+mean(w == 8)
+mean(better.w == 8)
+```
+
+#### Repeat 3M4.
+```{r}
+better.w6 <- rbinom(1e4, size=9, prob=better.samples)
+mean(w6 == 6)
+mean(better.w6 == 6)
+```
+
+## Hard
+```{r}
+birth1 <- c(1,0,0,0,1,1,0,1,0,1,0,0,1,1,0,1,1,0,0,0,1,0,0,0,1,0,
+0,0,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1,0,1,0,0,1,1,0,1,0,0,0,0,0,0,0,
+1,1,0,1,0,0,1,0,0,0,1,0,0,1,1,1,1,0,1,0,1,1,1,1,1,0,0,1,0,1,1,0,
+1,0,1,1,1,0,1,1,1,1)
+
+birth2 <- c(0,1,0,1,0,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,0,0,1,1,1,0,
+1,1,1,0,1,1,1,0,1,0,0,1,1,1,1,0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,0,1,1,0,1,1,0,1,1,1,0,0,0,0,0,0,1,0,0,0,1,1,0,0,1,0,0,1,1,
+0,0,0,1,1,1,0,0,0,0)
+
+sum(birth1) + sum(birth2) # Should be 111
+```
+
+### 3H1. Using grid approximation, computer the posterior distribution for the probability of a birth being a boy. Assume a uniform prior. Which parameter value maximizes the posterior probability?
+```{r}
+
+```
+
