@@ -187,10 +187,40 @@ birth2 <- c(0,1,0,1,0,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,0,0,1,1,1,0,
 0,0,0,1,1,1,0,0,0,0)
 
 sum(birth1) + sum(birth2) # Should be 111
+length(birth1) + length(birth2)
 ```
 
 ### 3H1. Using grid approximation, compute the posterior distribution for the probability of a birth being a boy. Assume a uniform prior. Which parameter value maximizes the posterior probability?
 ```{r}
+birth.N = 1000
+birth.p_grid = seq(0, 1, length.out = N)
+birth.all = c(birth1, birth2)
+length(birth.all)
+birth.prior = rep(1, birth.N)
+birth.likelihood = dbinom(sum(birth.all), size=length(birth.all), prob=birth.p_grid)
+birth.posterior = birth.likelihood * birth.prior / sum(birth.likelihood * birth.prior)
+plot(birth.posterior ~ birth.p_grid, type="l")
+birth.p_grid[which.max(birth.posterior)]
+```
 
+### 3H2. Using the sample function, draw 10,000 random parameter values from the posterior distribution. Use this samples to estimate the 50%, 89%, 97% highest posterior density intervals.
+```{r}
+birth.samples <- sample(birth.p_grid, size=1e4, replace = T, prob = birth.posterior)
+birth.samples_for_hpdi <- coda::as.mcmc(birth.samples)
+```
+
+* 50% HPDI:
+```{r}
+coda::HPDinterval(birth.samples_for_hpdi, prob=0.50)[1:2]
+```
+
+* 89% HPDI:
+```{r}
+coda::HPDinterval(birth.samples_for_hpdi, prob=0.89)[1:2]
+```
+
+* 97% HPDI:
+```{r}
+coda::HPDinterval(birth.samples_for_hpdi, prob=0.97)[1:2]
 ```
 
