@@ -1,0 +1,50 @@
+---
+title: "4 - Linear Models"
+output: 
+  pdf_document: 
+    fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+library(rethinking)
+```
+
+### 4.1.1. Normal by addition 
+
+```{r}
+# 4.1
+pos <- replicate(1000, sum(runif(16, -1, 1)))
+par(mfrow=c(1, 2))
+dens(pos, norm.comp = T)
+dens(replicate(10000, sum(runif(256, -1, 1))), norm.comp = T)
+```
+
+### 4.1.2. Normal by multiplication
+
+```{r}
+# 4.2
+dens(replicate(1e4, prod(1 + runif(12, 0, 0.1))), norm.comp = T)
+```
+
+```{r}
+# 4.4
+big <- replicate(1e4, prod(1 + runif(12, 0, 0.5)))
+small <- replicate(1e4, prod(1 + runif(12, 0, 0.01)))
+par(mfrow=c(1, 2))
+dens(big, norm.comp = T, main = "Big")
+dens(small, norm.comp = T, main = "Small")
+```
+
+### Normal by log-multiplication
+
+```{r}
+# 4.5
+big <- replicate(1e4, prod(1 + runif(12, 0, 1)))
+log_big <- log(big)
+par(mfrow=c(1, 2))
+dens(big, norm.comp = T, main = "Big")
+dens(log_big, norm.comp = T, main = "log(Big)")
+```
+
