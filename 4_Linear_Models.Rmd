@@ -48,3 +48,45 @@ dens(big, norm.comp = T, main = "Big")
 dens(log_big, norm.comp = T, main = "log(Big)")
 ```
 
+## 4.3 A Gaussian model of height
+```{r}
+# 4.7
+library(rethinking)
+data(Howell1)
+d <- Howell1
+```
+
+```{r}
+# 4.8
+str(d)
+```
+
+We want heights of adults only (352 rows):
+```{r}
+# 4.10
+d2 <- d[d$age >= 18, ]
+```
+
+### 4.3.2 The model
+
+Height mean:
+
+```{r}
+# 4.11
+curve(dnorm(x, 178, 20), from=100, to=250)
+```
+
+Height standard deviation:
+```{r}
+# 4.12
+curve(dunif(x, 0, 50), from=10, to=60)
+```
+
+```{r}
+# 4.13
+sample_mu <- rnorm(1e4, 178, 20)
+sample_sigma <- runif(1e4, 0, 50)
+prior_h <- rnorm(1e4, sample_mu, sample_sigma)
+dens(prior_h)
+```
+
