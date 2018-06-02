@@ -90,3 +90,85 @@ prior_h <- rnorm(1e4, sample_mu, sample_sigma)
 dens(prior_h)
 ```
 
+```{r}
+# 4.14
+mu_list <- seq(from=140, to=160, length.out=200)
+sigma_list <- seq(from=4, to=9, length.out=200)
+post <- expand.grid(mu=mu_list, sigma=sigma_list)
+post_ll <- sapply(1:nrow(post), function(i) sum(dnorm(
+  d2$height,
+  mean=post$mu[i],
+  sd=post$sigma[i],
+  log=T
+)))
+post_prob <- post_ll + dnorm(post$mu, 178, 20, T) + dunif(post$sigma, 0, 50, T)
+plot(post_prob, type="l")
+post_prob <- exp(post_prob - max(post_prob))
+```
+
+
+```{r}
+# 4.15
+contour_xyz(post$mu, post$sigma, post_prob)
+```
+
+```{r}
+# 4.16
+image_xyz(post$mu, post$sigma, post_prob)
+```
+
+
+
+### 4.3.4 Sampling from the posterior
+
+```{r}
+# 4.17
+sample.rows <- sample(1:nrow(post), size=1e4, replace = T, prob = post_prob)
+sample.mu <- post$mu[sample.rows]
+sample.sigma <- post$sigma[sample.rows]
+```
+
+```{r}
+# 4.18
+smoothScatter(sample.mu, sample.sigma, cex=0.5, pch=16, col=col.alpha(rangi2, 0.1))
+```
+```{r}
+# 4.19
+dens(sample.mu)
+dens(sample.sigma)
+```
+
+```{r}
+# 4.20
+HPDI(sample.mu)
+HPDI(sample.sigma)
+```
+
+### Smaller Sample
+To illustrate the posterior is not always Guassian in shape.
+
+```{r}
+# 4.22
+d3 <- sample(d2$height, size=10)
+
+small.post_ll <- sapply(1:nrow(post), function(i) sum(dnorm(d3, mean=post$mu[i], sd=post$sigma[i], log=T)))
+
+small.post_product <- small.post_ll + dnorm(post$mu, 178, 20, T) + dunif(post$sigma, 0, 50, T)
+
+small.post_proba <- exp(small.post_product - max(small.post_product))
+
+small.sample.rows <- sample(1:nrow(post), size=1e4, replace = T, prob=small.post_proba)
+
+small.sample.mu <- post$mu[small.sample.rows]
+small.sample.sigma <- post$sigma[small.sample.rows]
+```
+
+```{r}
+# 4.23
+dens(small.sample.sigma, norm.comp = T)
+```
+
+
+### 4.3.5. Fitting the model with *map*
+
+map finds the values of $\mu$ and $\sigma$ that maximize the posterior probability.
