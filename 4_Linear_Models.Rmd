@@ -117,8 +117,6 @@ contour_xyz(post$mu, post$sigma, post_prob)
 image_xyz(post$mu, post$sigma, post_prob)
 ```
 
-
-
 ### 4.3.4 Sampling from the posterior
 
 ```{r}
@@ -172,3 +170,87 @@ dens(small.sample.sigma, norm.comp = T)
 ### 4.3.5. Fitting the model with *map*
 
 map finds the values of $\mu$ and $\sigma$ that maximize the posterior probability.
+```{r}
+# 4.25
+model.list <- alist(
+  height ~ dnorm(mu, sigma),
+  mu ~ dnorm(178, 20),
+  sigma ~ dunif(0, 50)
+)
+
+```
+
+```{r}
+# 4.26
+model.solved <- map(model.list, data=d2)
+```
+
+```{r}
+# 4.27
+precis(model.solved)
+```
+
+Compare to HPDI intervals from above. 
+
+```{r}
+HPDI(sample.mu)
+HPDI(sample.sigma)
+```
+
+We've calculated the HPDI intervals using the grid approximation. The model is solved via a quadratic approximation. The quadratic approximation does a very good in identifying the 89% intervals. 
+
+It works because the posterior is approximately Gaussian.
+
+The priors we used so far are very weak. We'll splice in a more informative prior for $\mu$.
+
+```{r}
+#4.29
+model.solved_narrow_mu <- map (
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu ~ dnorm(178, 0.1),
+    sigma ~ dunif(0, 50)
+  ), 
+  data=d2)
+precis(model.solved_narrow_mu)
+```
+
+The estimate for $\mu$ has hardly moved off the prior. The estimate for $\sigma$ has changed a lot, even though we didn't change the prior at all. Our machine had to make $\mu$ and $\sigma$ fit out data. Since $\mu$ is very concerntrated around 178, the machine had to change $\sigma$ to accomodate the data.
+
+### 4.3.6. Sampling from a *map* fit.
+
+
+Variance-covariance matrix:
+```{r}
+# 4.30
+vcov(model.solved)
+```
+ We can split it into (1) vector of variances, and (2) the correlation matrix:
+```{r}
+# 4.31
+diag(vcov(model.solved))
+cov2cor(vcov(model.solved))
+```
+ 
+ Sampling from the posterior:
+```{r}
+# 4.34
+coef(model.solved)
+library(MASS)
+post <- mvrnorm(n=1e4, mu=coef(model.solved), Sigma=vcov(model.solved))
+post = data.frame(post)
+head(post)
+```
+ 
+```{r}
+# 4.33
+precis(post)
+```
+ 
+```{r}
+par(mfrow=c(1, 2))
+smoothScatter(sample.mu, sample.sigma, cex=0.5, pch=16, col=col.alpha(rangi2, 0.1))
+plot(post, col=col.alpha(rangi2, 0.1))
+```
+ 
+ 
