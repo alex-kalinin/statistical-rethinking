@@ -399,3 +399,36 @@ ablines_N(100)
 ablines_N(352)
 ```
 
+Let's predict value for individual who weighs 91 kg:
+```{r}
+# 4.50
+mu_at_50 <- post$a + post$b * 91
+dens(mu_at_50, col=rangi2, lwd=2, xlab = "mu | weight = 91")
+```
+
+```{r}
+# 4.52
+HPDI(mu_at_50, prob=0.89)
+```
+
+```{r}
+# 4.53
+mu <- link(model.linear_m43)
+str(mu)
+```
+
+
+Compute the distribution for each weight:
+```{r}
+# 4.54
+weight_seq <- seq(from=25, to=100, by=1)
+mu <- link(model.linear_m43, data=data.frame(weight=weight_seq))
+str(mu)
+```
+```{r}
+# 4.55
+plot(height ~ weight, d2, type="n")
+for (i in 1:100)
+  points(weight_seq, mu[i,], pch=16, col=col.alpha(rangi2, 0.1))
+```
+
