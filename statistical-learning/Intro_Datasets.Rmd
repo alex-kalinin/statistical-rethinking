@@ -1,0 +1,88 @@
+---
+title: "intro Datasets"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+knitr::opts_chunk$set(echo = TRUE)
+library(randomForest)
+library(tree)
+```
+
+
+```{r}
+
+set.seed(1)
+df <- read.csv("~/Downloads/Income2.csv", header = T)
+train_df <- df[1:21 , ]
+test_df <- df[22:30 ,]
+
+set.seed(1)
+rf <- randomForest(Income ~ ., data = train_df, ntree = 1, mtry=2, importance=T, maxnodes=1)
+rf
+
+# t <- tree(Income ~ ., data=train_df, control=tree.control(nrow(train_df), mincut=1, minsize=2, mindev=0))
+# t
+```
+
+```{r}
+y_pred <- predict(rf, train_df)
+y <- train_df["Income"][,1]
+u <- mean((y_pred - y)        ** 2)
+v <- mean((y - mean(y))  ** 2)
+1 - u/v
+```
+
+```{r}
+test.y_pred <- predict(rf, test_df)
+test.y <- test_df["Income"][,1]
+test.u <- mean((test.y_pred - test.y)        ** 2)
+test.v <- mean((test.y - mean(y))  ** 2)
+1 - test.u/test.v
+```
+```{r}
+oob.y_pred <- predict(rf)
+oob.y <- test_df["Income"][,1]
+oob.u <- mean((oob.y_pred - oob.y)        ** 2)
+oob.v <- mean((oob.y - mean(y))  ** 2)
+1 - test.u/test.v
+```
+
+```{r}
+nrow(train_df)
+```
+
+```{r}
+
+```
+
+```{r}
+rf$importance
+```
+
+```{r}
+rf
+```
+
+```{r}
+plot(rf)
+```
+```{r}
+plot(train_df)
+```
+
+# Iris Classification
+
+```{r}
+data(iris)
+set.seed(250)
+iris.rf <- randomForest(Species ~ ., data = iris, ntrees = 2000)
+iris.rf
+plot(iris.rf)
+
+
+iris[, c("Species", "Sepal.Width")]
+
+```
+

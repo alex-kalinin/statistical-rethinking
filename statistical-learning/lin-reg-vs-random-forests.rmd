@@ -16,6 +16,12 @@ boston.test <- Boston[-train, "medv"]
 boston.train <- Boston[train, "medv"]
 ```
 
+```{r}
+
+```
+
+
+
 ## Linear Regression 
 
 ```{r}
@@ -39,7 +45,8 @@ mean((yhat.lm - boston.test)^2)
 Let's train a random forest:
 
 ```{r}
-rf.boston <- randomForest(medv ~ ., data = Boston, subset = train, mtry=6, ntree=200)
+rf.boston <- randomForest(medv ~ ., data = Boston, subset = train, mtry=6, ntree=1, maxnodes=1)
+rf.boston
 ```
 
 Now test the prediction accuracy on the test set:
