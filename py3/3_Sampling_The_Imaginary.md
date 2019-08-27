@@ -138,7 +138,7 @@ def quantile(arr, perc_list):
         c = np.ceil(k)
         result = None
         if f == c:
-            resultt = arr[int(k)]
+            result = arr[int(k)]
         else:
             d0 = arr[int(f)] * (c - k)
             d1 = arr[int(c)] * (k - f)
