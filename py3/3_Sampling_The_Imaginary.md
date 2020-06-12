@@ -147,6 +147,9 @@ def quantile(arr, perc_list):
     
     arr = np.sort(arr)
     
+    if isinstance(perc_list, list):
+        perc_list = np.array(perc_list)
+        
     if isinstance(perc_list, np.ndarray):
         result = np.zeros_like(perc_list)
         for i, p in enumerate(perc_list):
